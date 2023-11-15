@@ -1,18 +1,27 @@
 import { GetStaticPaths, GetStaticProps } from "next"
 import { Layout } from "@/components/layouts"
-import { FC } from "react"
+import { FC, useState } from "react"
 import { pokeAPI } from "@/api";
 import { Pokemon } from "@/interfaces";
 import { Button, Card, Container, Grid, Image, Text } from "@nextui-org/react";
+import { existsInFavorites, toggleFavorite } from "@/utils";
 
 interface Props{
   pokemon: Pokemon;
 }
 
 const PokemonPage: FC<Props> = ({ pokemon }) => {
+  
+  const [isInFavorites, setIsInFavorites] = useState(existsInFavorites(pokemon.id));
+
+  const onToggleFavourite = () => {
+    toggleFavorite(pokemon.id);
+    setIsInFavorites(!isInFavorites);
+  }
+
   //-- Se ejecuta en el servidor y en la web
   return (
-    <Layout title="Algún pokémon">
+    <Layout title={pokemon.name}>
         <Grid.Container
           css={{ marginTop:'5px' }}
           gap={ 2 }
@@ -40,9 +49,10 @@ const PokemonPage: FC<Props> = ({ pokemon }) => {
                 <Text h1 transform="capitalize">{ pokemon.name }</Text>
                 <Button
                   color="gradient"
-                  ghost
+                  ghost={ !isInFavorites } 
+                  onClick={ onToggleFavourite }
                 >
-                  Guardar en Favoritos
+                  { isInFavorites ? 'En Favoritos':'Guardar En Favoritos' }
                 </Button>
               </Card.Header>
               <Card.Body>
